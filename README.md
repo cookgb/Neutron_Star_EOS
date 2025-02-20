@@ -13,11 +13,15 @@ is preferable.
    2) Each column contains the base 10 logarithm of a 
       quantity in cgs units.
 
-        Column 1: Baryon number density - [cm^(-3)].
-                  (From rest mass density where the mass of one
-                   baryon is taken as 1.659e-24 g.)
-        Column 2: Total energy density  - [g cm^(-3)].
-        Column 3: Pressure              - [dyne cm^(-3)].
+        Column 1: Baryon number density - [cm^(-3)]. 
+                  (*From rest mass density where the mass of one
+                   baryon is taken as 1.659e-24 g*.)
+      
+        Column 2: Total energy density  - [g cm^(-3)]. 
+        (*Note that the total energy density is given in terms of a mass density,
+not energy density*.)
+      
+        Column 3: Pressure              - [dyne cm^(-2)].
 
 A tabulated EOS typically has about 500 entries which are roughly
 evenly spaced in the base 10 log of the total energy density.
