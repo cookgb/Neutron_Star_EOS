@@ -1,4 +1,4 @@
-    Tabulated Equations of State (EOS) for Rotating Neutron Star Code.
+# Tabulated Equations of State (EOS) for Rotating Neutron Star Code.
 
 A tabulated EOS for the rotating NS code requires three entries:
    1) Baryon number density
@@ -40,3 +40,13 @@ I try to put more resolution wherever it is needed, and I NEVER
 interpolate across phase transitions.  Wherever a phase transition
 occurs, I make sure to put a point in the table at each end of the
 transition.
+
+## HDF5 
+
+A Julia script has been added which creates a self-documented collection of all of the
+EOS currently in this repository.  Simply `cd` into the directory `HDF5` and run
+```
+julia HDF5EOS.jl
+```
+This will create the file `Tabulated_EOS.h5`.  For a list of all the options for this script,
+run `julia HDF5EOS.jl -h`
