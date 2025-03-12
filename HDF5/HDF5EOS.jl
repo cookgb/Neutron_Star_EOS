@@ -114,18 +114,10 @@ if haskey(parsed_args,"remove")
 				try 
 					h5open("Updated"*HDFfilename,"w") do h5rm # Open a new file for the truncated set
 						rmEOSgroup = Set(strip.(split(removeEOS,","))) # Set of EOS to omit from new file
-						EOSgroups = read(h5f) # get a Dictionary of top level groups and their data sets
-						for group in keys(EOSgroups)
+						for group in keys(h5f)
 							if !in(group,rmEOSgroup) # copy the group if the EOS is not being deleted
 								try
-									eosgroup = create_group(h5rm,group) # create the group in the new file
-									for dataset in keys(EOSgroups[group]) # copy all the data sets
-										write_dataset(eosgroup,dataset,EOSgroups[group][dataset])
-									end
-									EOSgrpattrs = attrs(h5f[group]) # copy all the attributes
-									for grpatt in keys(EOSgrpattrs)
-										write_attribute(eosgroup,grpatt,EOSgrpattrs[grpatt])
-									end
+									copy_object(h5f,group,h5rm,group)
 								catch
 									println("Couldn't copy EOS ",group)
 									exit()
@@ -163,17 +155,18 @@ for eos in eosnames
 			try
 				eosgroup = create_group(h5f,eos["Name"])
 				# Store the Tabulated EOS values; Note Julia is column major, so transpose the array
-				write_dataset(eosgroup,"Table",permutedims(eostable))
+				eosgroup["Table"] = permutedims(eostable)
 				# Save the name as an attribute
-				write_attribute(eosgroup,"EOS Name",eos["Name"])
+				attrs(eosgroup)["EOS Name"] = eos["Name"]
 				# Save the baryon mass
-				write_attribute(eosgroup,"BaryonMass",eos["BaryonMass"])
+				attrs(eosgroup)["BaryonMass"] = eos["BaryonMass"]
+				attrs(eosgroup)["BaryonMass Units"] = "g/baryon"
 				# Does the EOS contain phase transitions
-				write_attribute(eosgroup,"PhaseTransition",eos["PhaseTransition"])
+				attrs(eosgroup)["PhaseTransition"] = eos["PhaseTransition"]
 				if eos["PhaseTransition"]
 					# store matrix of transition indices in the format [t1i t1f; t2i t2f; t3i t3f; ...]
 					# Note Julia is column major, so transpose the array
-					write_attribute(eosgroup,"TransitionIndices",permutedims(eos["TransitionIndices"]))
+					attributes(eosgroup)["TransitionIndices"] = eos["TransitionIndices"]
 				else
 					# make sure that there are no phase transitions in the EOS
 					pressure = eostable[:,3]
@@ -195,13 +188,13 @@ for eos in eosnames
 					end
 				end
 				# Store a reference for the EOS; preferably a DOI
-				write_attribute(eosgroup,"Reference",eos["Reference"])
+				attrs(eosgroup)["Reference"] = eos["Reference"]
 				# Store additional description of the EOS
-				write_attribute(eosgroup,"Description",eos["Description"])
+				attrs(eosgroup)["Description"] = eos["Description"]
 				# Document the columns
-				write_attribute(eosgroup,"Column 1","Log10(Baryon number density) - [cm^(-3)];")
-				write_attribute(eosgroup,"Column 2","Log10(Total energy density) - [g cm^(-3)]")
-				write_attribute(eosgroup,"Column 3","Log10(Pressure) - [dyne cm^(-2)]")
+				attrs(eosgroup)["Column 0"] = "Log10(Baryon number density) - [cm^(-3)]"
+				attrs(eosgroup)["Column 1"] = "Log10(Total energy density) - [g cm^(-3)]"
+				attrs(eosgroup)["Column 2"] = "Log10(Pressure) - [dyne cm^(-2)]"
 			catch
 				println("EOS ",eos["Name"]," already exists in Tabulated_EOS.h5.  Remove to update.")
 			end
